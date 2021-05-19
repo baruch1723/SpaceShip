@@ -2,19 +2,20 @@
 
 public class BackgroundScroller : MonoBehaviour
 {
-    [SerializeField] private float scrollSpeed;
-    private Renderer renderer;
+    [SerializeField] private float _scrollSpeed;
+    
+    private Renderer _renderer;
     private const string TextureName = "_MainTex";
 
     void Start()
     {
-        renderer = GetComponent<Renderer>();
+        _renderer = GetComponent<Renderer>();
     }
 
     void Update()
     {
-        float x = Mathf.Repeat(Time.time * scrollSpeed, 1);
-        Vector2 offset = new Vector2(x, 0);
-        renderer.sharedMaterial.SetTextureOffset(TextureName, offset);
+        var x = Mathf.Repeat(Time.time * _scrollSpeed, 1);
+        var offset = new Vector2(x, 0);
+        _renderer.sharedMaterial.SetTextureOffset(TextureName, offset);
     }
 }

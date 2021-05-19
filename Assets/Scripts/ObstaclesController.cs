@@ -1,45 +1,60 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ObstaclesController : MonoBehaviour
 {
-    [SerializeField] private GameObject obstaclePrefab;
-    [SerializeField] private Vector2 obstacleSpawnPos = new Vector2(-15, -25);
-    [SerializeField] private int obstaclesSize = 5;
-    [SerializeField] private float spawnRate = 3f;
-    [SerializeField] private float obstacleMinYPos = -1f;
-    [SerializeField] private float obstacleMaxYPos = 3.5f;
-    [SerializeField] private float spawnXPos = 10f;
-    [SerializeField] private float scrollSpeed = -1.5f;
+    [SerializeField] private GameObject _obstaclePrefab;
+    [SerializeField] private Vector2 _obstacleSpawnPos = new Vector2(-15, -25);
+    
+    [SerializeField] private int _obstaclesSize = 5;
+    [SerializeField] private float _spawnRate = 3f;
+    [SerializeField] private float _obstacleMinYPos = -1f;
+    [SerializeField] private float _obstacleMaxYPos = 3.5f;
+    [SerializeField] private float _spawnXPos = 10f;
+    [SerializeField] private float _scrollSpeed = -1.5f;
+    [SerializeField] private float _scrollSpeedMulti = 3f;
 
-    private GameObject[] obstacles;
-    private int currentObstacle = 0;
-    private float timeSinceLastSpawned;
+    private GameObject[] _obstacles;
+    
+    private int _currentObstacle = 0;
+    private float _timeSinceLastSpawned;
 
-    void Start()
+    private void Start()
     {
-        timeSinceLastSpawned = 0f;
-        obstacles = new GameObject[obstaclesSize];
-        for (int i = 0; i < obstaclesSize; i++)
+        _timeSinceLastSpawned = 0f;
+        _obstacles = new GameObject[_obstaclesSize];
+        for (int i = 0; i < _obstaclesSize; i++)
         {
-            obstacles[i] = Instantiate(obstaclePrefab, obstacleSpawnPos, Quaternion.identity);
-            var rb = obstacles[i].transform.GetComponent<Rigidbody2D>();
-            rb.velocity = new Vector2 (scrollSpeed, 0);
+            _obstacles[i] = Instantiate(_obstaclePrefab, _obstacleSpawnPos, Quaternion.identity);
+            var rb = _obstacles[i].transform.GetComponent<Rigidbody2D>();
+            rb.velocity = Vector2.right * _scrollSpeed;
         }
     }
-
+    
     void Update()
     {
-        timeSinceLastSpawned += Time.deltaTime;
+        if (!GameManager.Instance.GameStarted) return;
+        _timeSinceLastSpawned += Time.deltaTime;
+        _scrollSpeed -= Time.deltaTime * _scrollSpeedMulti;
 
-        if (timeSinceLastSpawned >= spawnRate)
+        foreach (var obstacle in _obstacles)
         {
-            timeSinceLastSpawned = 0f;
-            var spawnYPos = Random.Range(obstacleMinYPos, obstacleMaxYPos);
-            obstacles[currentObstacle].transform.position = new Vector2(spawnXPos, spawnYPos);
-            currentObstacle++;
-            if (currentObstacle >= obstaclesSize)
+            var rb = obstacle.gameObject.GetComponent<Rigidbody2D>();
+            rb.velocity = Vector2.right * _scrollSpeed;
+        }
+
+        if (_timeSinceLastSpawned >= _spawnRate)
+        {
+            _timeSinceLastSpawned = 0f;
+
+            var spawnYPos = Random.Range(_obstacleMinYPos, _obstacleMaxYPos);
+            _obstacles[_currentObstacle].transform.position = new Vector2(_spawnXPos, spawnYPos);
+            _currentObstacle++;
+
+            if (_currentObstacle >= _obstaclesSize)
             {
-                currentObstacle = 0;
+                _currentObstacle = 0;
             }
         }
     }

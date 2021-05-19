@@ -2,20 +2,20 @@
 
 public class SpaceShipController : MonoBehaviour
 {
-    [SerializeField] private float force;
-    private Rigidbody2D rb;
+    [SerializeField] private float _force;
+    private Rigidbody2D _rb;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            rb.velocity = Vector2.zero;
-            rb.AddForce(Vector2.up * force);
+            _rb.velocity = Vector2.zero;
+            _rb.AddForce(Vector2.up * _force);
         }
     }
 

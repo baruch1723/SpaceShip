@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -8,12 +9,15 @@ public class GameManager : MonoBehaviour
 	
 	private const string ScoreString = "Distance: ";
 	
-	[SerializeField] private Text distanceText;
-	[SerializeField] private GameObject gameOverText;
+	[SerializeField] private GameObject _gameOverText;
+	[SerializeField] private Text _distanceText;
 	
-	private float distance;
-	private bool isGameOver = false;
-
+	private float _distance;
+	private float _distanceForce = 100f;
+	private bool _isGameOver = false;
+	private bool _gameStarted = false;
+	public bool GameStarted => _gameStarted;
+	
 	void Awake()
 	{
 		if (Instance == null)
@@ -24,27 +28,36 @@ public class GameManager : MonoBehaviour
 		{
 			Destroy (gameObject);
 		}
-		
-		Time.timeScale = 1;
-		distance = 0f;
-		gameOverText.SetActive(false);
+
+		StartGame();
 	}
-
-	void Update()
+	
+	public void StartGame()
 	{
-		distance += Time.deltaTime * 100f;
-		distanceText.text = ScoreString + distance.ToString();
-
-		if (isGameOver && Input.GetKeyDown(KeyCode.Space)) 
-		{
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-		}
+		Time.timeScale = 1;
+		_distanceText.gameObject.SetActive(true);
+		_gameOverText.SetActive(false);
+		_gameStarted = true;
+		_isGameOver = false;
+		_distance = 0f;
 	}
 
 	public void GameOver()
 	{
-		gameOverText.SetActive(true);
-		isGameOver = true;
 		Time.timeScale = 0;
+		_gameOverText.SetActive(true);
+		_isGameOver = true;
+	}
+	
+	void Update()
+	{
+		if (!_gameStarted) return;
+		_distance += Time.deltaTime * _distanceForce;
+		_distanceText.text = ScoreString + _distance.ToString();
+
+		if (_isGameOver && Input.GetKeyDown(KeyCode.Space)) 
+		{
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		}
 	}
 }
